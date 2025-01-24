@@ -88,23 +88,26 @@ public class LinkedList {
 					"index must be between 0 and size");
 		}
 
+		Node newNode = new Node(block);
 		if (index == 0) {
-			addFirst(block);
-			return;
+			newNode.next = first;
+			first = newNode;
+			if (last == null) {
+				// last is null in case it's the first inserted node
+				last = newNode;
+			}
+			size++;
 		}
 		else if (index == size) {
-			addLast(block);
-			return;
+			last.next = newNode;
+			last = newNode;
+			size++;
 		}
-
-		Node newNode = new Node(block);
-		Node current = first;
-		for (int j = 0; j < index - 1; j++) {
-			current = current.next;
+		else {
+			newNode.next = getNode(index);
+			getNode(index - 1).next = newNode;
+			size++;
 		}
-		newNode.next = current.next;
-		current.next = newNode;
-		size++;
 	}
 
 	/**
@@ -116,16 +119,7 @@ public class LinkedList {
 	 */
 	public void addLast(MemoryBlock block) {
 		//// Write your code here
-		if (size == 0) {
-			addFirst(block);
-			return;
-		}
-		else {
-			Node newNode = new Node(block);
-            last.next = newNode;
-			last = newNode;
-			size++;
-		}
+		add(size, block);
 	}
 	
 	/**
@@ -137,13 +131,7 @@ public class LinkedList {
 	 */
 	public void addFirst(MemoryBlock block) {
 		//// Write your code here
-		Node newNode = new Node(block);
-        newNode.next = first; 
-        first = newNode;      
-        size++;
-		if (size == 1) {
-			last = first;
-		}
+		add(0, block);
 	}
 
 	/**
@@ -157,11 +145,13 @@ public class LinkedList {
 	 */
 	public MemoryBlock getBlock(int index) {
 		//// Replace the following statement with your code
-		if (index < 0 || index > size) {
+		if (index < 0 || index >= size) {
 			throw new IllegalArgumentException(
 				"index must be between 0 and size");
 		}
 		return getNode(index).block;
+
+	
 	}	
 
 	/**
@@ -173,6 +163,10 @@ public class LinkedList {
 	 */
 	public int indexOf(MemoryBlock block) {
 		//// Replace the following statement with your code
+		if (size == 0 || block == null){
+			return -1;
+		}
+		
 		Node current = first;
         int index = 0;
 		while (current != null) {
