@@ -250,15 +250,13 @@ public class LinkedList {
 	 */
 	public String toString() {
 		//// Replace the following statement with your code
-		if (size == 0) return "()";
-        String str = "(";
-        // Starting from the first node, iterates through this list
-        Node current = first;
-        while (current != null) {
-            str += current.block + ", ";
-            current = current.next;
-        }
-        return str.substring(0, str.length() - 2) + ")";
+		String result = "";
+    	Node current = first;
+    	for(int i = 0 ; i < size ; i ++) {
+        	result += current.block.toString() + " "; 
+        	current = current.next; 
+		}
+    	return result;
 	}
 
 	public void sort (){
