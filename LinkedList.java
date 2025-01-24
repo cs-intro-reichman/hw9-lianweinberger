@@ -88,21 +88,22 @@ public class LinkedList {
 					"index must be between 0 and size");
 		}
 
-		Node newNode = new Node(block);
 		if (index == 0) {
-			newNode.next = first;
-			first = newNode;
+			addFirst(block);
+			return;
 		}
 		else if (index == size) {
-			last.next = newNode;
-			last = newNode;
+			addLast(block);
+			return;
 		}
-		else {
-			Node current = getNode(index - 1);
-			Node pushNode = current.next;
-			current.next = newNode;
-			newNode.next = pushNode;
+
+		Node newNode = new Node(block);
+		Node current = first;
+		for (int j = 0; j < index - 1; j++) {
+			current = current.next;
 		}
+		newNode.next = current.next;
+		current.next = newNode;
 		size++;
 	}
 
@@ -115,7 +116,16 @@ public class LinkedList {
 	 */
 	public void addLast(MemoryBlock block) {
 		//// Write your code here
-		add(size, block);
+		if (size == 0) {
+			addFirst(block);
+			return;
+		}
+		else {
+			Node newNode = new Node(block);
+            last.next = newNode;
+			last = newNode;
+			size++;
+		}
 	}
 	
 	/**
@@ -127,7 +137,13 @@ public class LinkedList {
 	 */
 	public void addFirst(MemoryBlock block) {
 		//// Write your code here
-		add(0, block);
+		Node newNode = new Node(block);
+        newNode.next = first; 
+        first = newNode;      
+        size++;
+		if (size == 1) {
+			last = first;
+		}
 	}
 
 	/**

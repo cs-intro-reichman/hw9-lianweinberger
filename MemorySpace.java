@@ -79,7 +79,7 @@ public class MemorySpace {
 		}
 		return -1;
 	}
-	
+
 	/**
 	 * Frees the memory block whose base address equals the given address.
 	 * This implementation deletes the block whose base address equals the given 
@@ -109,7 +109,6 @@ public class MemorySpace {
 			freeList.addLast(freeBlock.block);
 			allocatedList.remove(freeBlock.block);
 		}
-
 	}
 
 	/**
