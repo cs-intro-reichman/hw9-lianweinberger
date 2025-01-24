@@ -58,25 +58,20 @@ public class MemorySpace {
 	 * @return the base address of the allocated block, or -1 if unable to allocate
 	 */
 	public int malloc(int length) {		
-		//// Replace the following statement with your code
-		ListIterator newFreeList = freeList.iterator();
-		while (newFreeList.hasNext()){
-			MemoryBlock memoryBlock = newFreeList.current.block;
-			if (memoryBlock.length >= length) {
-				allocatedList.addLast(new MemoryBlock(memoryBlock.baseAddress, length));
-				if (memoryBlock.length == 0){
-					freeList.remove(newFreeList.current);
-				}
-				else {
-					memoryBlock.baseAddress += length;
-					memoryBlock.length -= length;
-				}
-				return memoryBlock.baseAddress;
-
-			}
-			newFreeList.next();
-		}
-		return -1;
+		for (int i = 0; i < freeList.getSize(); i++) {
+            MemoryBlock current = freeList.getBlock(i);
+            if (current.length >= length) {
+                int baseAddress = current.baseAddress;
+                allocatedList.addLast(new MemoryBlock(baseAddress, length));
+                current.baseAddress += length;
+                current.length -= length;
+                if (current.length == 0) {
+                    freeList.remove(i);
+                }
+                return baseAddress;
+            }
+        }
+        return -1;
 	}
 
 	/**
@@ -93,17 +88,20 @@ public class MemorySpace {
 			throw new IllegalArgumentException(
 					"index must be between 0 and size");
 		}
-
-		Node current = allocatedList.getFirst();
-		while(current != null) {
-			if (current.block.baseAddress == address) {
-				allocatedList.remove(current);
-				freeList.addLast(current.block);
-			}
-			current = current.next;
-		}
+		MemoryBlock freeMemoryBlock = null;
+		for (int i = 0; i < allocatedList.getSize(); i++) {
+            MemoryBlock current = allocatedList.getBlock(i);
+            if (current.baseAddress == address) {
+                freeMemoryBlock = current;
+                break;
+            }
+        }
+		if (freeMemoryBlock != null) {
+            allocatedList.remove(freeMemoryBlock);
+        	freeList.addLast(freeMemoryBlock);
+        }
 	}
-	
+
 	/**
 	 * A textual representation of the free list and the allocated list of this memory space, 
 	 * for debugging purposes.
@@ -119,10 +117,6 @@ public class MemorySpace {
 	 */
 	public void defrag() {
 		//// Write your code here
-		if (freeList.getSize() <= 1) {
-			return;
-		}
-
 		boolean change = false;
 		Node check = freeList.getFirst();
 		for(int i = 0; i < freeList.getSize(); i++) {
