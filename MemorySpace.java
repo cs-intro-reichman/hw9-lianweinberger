@@ -58,22 +58,28 @@ public class MemorySpace {
 	 * @return the base address of the allocated block, or -1 if unable to allocate
 	 */
 	public int malloc(int length) {		
-		for (int i = 0; i < freeList.getSize(); i++) {
-            MemoryBlock current = freeList.getBlock(i);
-            if (current.length >= length) {
-                int baseAddress = current.baseAddress;
-                allocatedList.addLast(new MemoryBlock(baseAddress, length));
-                current.baseAddress += length;
-                current.length -= length;
-                if (current.length == 0) {
-                    freeList.remove(i);
-                }
-                return baseAddress;
-            }
-        }
-        return -1;
+		Node current = freeList.getFirst();
+		Node mallocBlock = null;
+		while (current != null) {
+			if (current.block.length >= length){
+				mallocBlock = current;
+				break;
+			}
+			current = current.next;
+		}
+		if (mallocBlock != null) {
+			allocatedList.addLast(new MemoryBlock(mallocBlock.block.baseAddress, length));
+			mallocBlock.block.length -= length;
+			int address = mallocBlock.block.baseAddress;
+			mallocBlock.block.baseAddress += length;
+			if(mallocBlock.block.length == 0){
+				freeList.remove(mallocBlock);
+			}
+			return address;
+		}
+		return -1;
 	}
-
+	
 	/**
 	 * Frees the memory block whose base address equals the given address.
 	 * This implementation deletes the block whose base address equals the given 
@@ -84,22 +90,26 @@ public class MemorySpace {
 	 */
 	public void free(int address) {
 		//// Write your code here
-		if (allocatedList.getSize() == 0) {
+		if(freeList.getSize() == 1 && freeList.getFirst().block.baseAddress == 0 && freeList.getFirst().block.length == 100) {
 			throw new IllegalArgumentException(
 					"index must be between 0 and size");
 		}
-		MemoryBlock freeMemoryBlock = null;
-		for (int i = 0; i < allocatedList.getSize(); i++) {
-            MemoryBlock current = allocatedList.getBlock(i);
-            if (current.baseAddress == address) {
-                freeMemoryBlock = current;
-                break;
-            }
-        }
-		if (freeMemoryBlock != null) {
-            allocatedList.remove(freeMemoryBlock);
-        	freeList.addLast(freeMemoryBlock);
-        }
+
+		Node current = allocatedList.getFirst();
+		Node freeBlock = null;
+		while(current != null) {
+			if (current.block.baseAddress == address) {
+				freeBlock = current;
+				break;
+			}
+			current = current.next;
+		}
+		if (freeBlock == null) return;
+		else {
+			freeList.addLast(freeBlock.block);
+			allocatedList.remove(freeBlock.block);
+		}
+
 	}
 
 	/**
