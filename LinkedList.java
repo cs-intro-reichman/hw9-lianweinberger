@@ -83,11 +83,16 @@ public class LinkedList {
 	 */
 	public void add(int index, MemoryBlock block) {
 		//// Write your code here
+		if (index < 0 || index > size) {
+			throw new IllegalArgumentException(
+					"index must be between 0 and size");
+		}
+
 		if (index == 0) {
 			addFirst(block);
 			return;
 		}
-		if (index == size) {
+		else if (index == size) {
 			addLast(block);
 			return;
 		}
@@ -111,16 +116,16 @@ public class LinkedList {
 	 */
 	public void addLast(MemoryBlock block) {
 		//// Write your code here
-        Node newNode = new Node(block);
-		if (first == null) first = newNode;
-		else {
-			Node current = first;
-            while (current.next != null) {
-                current = current.next;
-            }
-            current.next = newNode;
+		if (size == 0) {
+			addFirst(block);
+			return;
 		}
-		size++;
+		else {
+			Node newNode = new Node(block);
+            last.next = newNode;
+			last = newNode;
+			size++;
+		}
 	}
 	
 	/**
@@ -136,6 +141,9 @@ public class LinkedList {
         newNode.next = first; 
         first = newNode;      
         size++;
+		if (size == 1) {
+			last = first;
+		}
 	}
 
 	/**
@@ -185,7 +193,7 @@ public class LinkedList {
 	 */
 	public void remove(Node node) {
 		//// Write your code here
-		remove(node.block);
+		remove(indexOf(node.block));
 	}
 
 	/**
@@ -201,16 +209,21 @@ public class LinkedList {
 			throw new IllegalArgumentException(
 				"index must be between 0 and size");
 		}
-		Node prev = null;
-        Node current = first;
-        int j = 0;
-        while (j < index) {
-            prev = current;
-            current = current.next;
-            j++;
-        }
-        prev.next = current.next;
-        size--;
+
+		if (index == 0) {
+			first = first.next;
+			if (size == 1) {
+				last = null;
+			}
+		} 
+		else {
+			Node prev = getNode(index - 1);
+			prev.next = prev.next.next;
+			if (index == size - 1) {
+				last = prev;
+			}
+		}
+		size--;
 	}
 
 	/**
@@ -222,23 +235,7 @@ public class LinkedList {
 	 */
 	public void remove(MemoryBlock block) {
 		//// Write your code here
-		Node prev = null;
-		Node current = first;
-		while (current != null && current.block.equals(block)) {
-            prev = current;
-            current = current.next;
-        }
-        if (current == null) { 
-			throw new IllegalArgumentException(
-				"block is not in this list");
-		}
-        if (prev == null) {
-            first = first.next;
-        } 
-        else {
-            prev.next = current.next;
-        }
-        size--;
+		remove(indexOf(block));
 	}	
 
 	/**
